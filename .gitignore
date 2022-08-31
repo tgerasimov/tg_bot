@@ -5,4 +5,5 @@ go.sum
 .jpeg
 .config.env
 game_end.jpg
+.DS_Store
 game_begin.jpeg
