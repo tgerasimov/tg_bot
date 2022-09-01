@@ -1,15 +1,17 @@
 package user_list
 
 import (
-	"bot_tg/internal/datastruct"
 	"sync"
+
+	"bot_tg/internal/datastruct"
 )
 
 type UserList interface {
 	GetUser(id int) (datastruct.User, bool)
 	InsertUser(user datastruct.User)
 	GetRandomUser() (randomUser datastruct.User, exists bool)
-	GetAllUsers() []datastruct.User
+	GetAllUsers() map[int]datastruct.User
+	Exists(id int) bool
 }
 
 type userList struct {
@@ -20,6 +22,7 @@ func NewUserList() UserList {
 	return &userList{userVault: new(sync.Map)}
 }
 
+//GetUser ...
 func (u *userList) GetUser(id int) (datastruct.User, bool) {
 	value, exists := u.userVault.Load(id)
 	if exists {
@@ -30,15 +33,17 @@ func (u *userList) GetUser(id int) (datastruct.User, bool) {
 	return datastruct.User{}, false
 }
 
+//InsertUser ...
 func (u *userList) InsertUser(user datastruct.User) {
 	u.userVault.Store(user.UserID, user)
 }
 
-func (u *userList) GetAllUsers() []datastruct.User {
-	res := make([]datastruct.User, 0)
+//GetAllUsers ...
+func (u *userList) GetAllUsers() map[int]datastruct.User {
+	res := make(map[int]datastruct.User)
 	u.userVault.Range(func(key, value any) bool {
 		if us, ok := value.(datastruct.User); ok {
-			res = append(res, us)
+			res[us.UserID] = us
 			return true
 		}
 		return false
@@ -46,6 +51,7 @@ func (u *userList) GetAllUsers() []datastruct.User {
 	return res
 }
 
+//GetRandomUser ...
 func (u *userList) GetRandomUser() (randomUser datastruct.User, exists bool) {
 	u.userVault.Range(func(key, value any) bool {
 		if us, ok := value.(datastruct.User); ok {
@@ -57,4 +63,16 @@ func (u *userList) GetRandomUser() (randomUser datastruct.User, exists bool) {
 		return false
 	})
 	return randomUser, exists
+}
+
+//Exists check does user exists
+func (u *userList) Exists(id int) bool {
+	value, ex := u.userVault.Load(id)
+	if ex {
+		if _, ok := value.(datastruct.User); ok {
+			return true
+		}
+		return false
+	}
+	return false
 }
