@@ -16,7 +16,7 @@ var (
 )
 
 var CommandList = map[string]string{
-	"/зарегестрироваться": "команда используется для регистрации пользователя в игре",
+	"/зарегистрироваться": "команда используется для регистрации пользователя в игре",
 	"/ПиД":                "начать игру",
 	"/команды":            "показывает список команд",
 	"/участники":          "показать всех участников",
@@ -50,7 +50,7 @@ func startListenCommands(ctx context.Context,
 		case update := <-chTG:
 			if _, ok := CommandList[update.Message.Text]; ok {
 				switch update.Message.Text {
-				case "/зарегестрироваться":
+				case "/зарегистрироваться":
 					registerUserComma.Start(update)
 				case "/команды":
 					defaultComma.CommandList(update)
